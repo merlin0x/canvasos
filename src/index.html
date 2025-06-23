@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Canvas OS MVP</title>
+  <title>Canvas OS MVP - Fixed</title>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- RxJS -->
+  <script src="https://unpkg.com/rxjs@7/dist/bundles/rxjs.umd.min.js"></script>
+  
+  <!-- Babel для JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
   <style>
     * {
       margin: 0;
@@ -13,7 +24,7 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #1a1a1a;
+      background: #0a0a0a;
       color: #fff;
       overflow: hidden;
     }
@@ -21,18 +32,22 @@
     #root {
       width: 100vw;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
     
     .toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 48px;
-      background: #2a2a2a;
+      background: rgba(42, 42, 42, 0.95);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid #444;
       display: flex;
       align-items: center;
       padding: 0 16px;
-      gap: 16px;
+      gap: 12px;
+      z-index: 1000;
     }
     
     .toolbar button {
@@ -42,8 +57,9 @@
       border: 1px solid #555;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       transition: all 0.2s;
+      white-space: nowrap;
     }
     
     .toolbar button:hover {
@@ -51,91 +67,69 @@
       border-color: #666;
     }
     
-    .main-container {
-      flex: 1;
-      display: flex;
-      position: relative;
+    .toolbar button:active {
+      transform: translateY(1px);
+    }
+    
+    .divider {
+      width: 1px;
+      height: 24px;
+      background: #555;
+      margin: 0 4px;
+    }
+    
+    .canvas-wrapper {
+      position: absolute;
+      top: 48px;
+      left: 0;
+      right: 0;
+      bottom: 24px;
+      overflow: auto;
+      background: #1a1a1a;
     }
     
     .canvas-container {
-      flex: 1;
       position: relative;
+      width: 5000px;
+      height: 5000px;
       background: #1a1a1a;
-      background-image: radial-gradient(circle, #333 1px, transparent 1px);
-      background-size: 20px 20px;
-      overflow: hidden;
+      background-image: 
+        radial-gradient(circle, #333 1px, transparent 1px),
+        linear-gradient(#222 1px, transparent 1px),
+        linear-gradient(90deg, #222 1px, transparent 1px);
+      background-size: 20px 20px, 100px 100px, 100px 100px;
+      background-position: 0 0, -1px -1px, -1px -1px;
     }
     
-    .editor-panel {
-      position: absolute;
+    .minimap {
+      position: fixed;
+      bottom: 40px;
       right: 20px;
-      top: 20px;
-      width: 400px;
-      height: 300px;
-      background: #2a2a2a;
+      width: 200px;
+      height: 150px;
+      background: rgba(42, 42, 42, 0.95);
       border: 1px solid #444;
       border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      display: none;
-      flex-direction: column;
+      overflow: hidden;
+      z-index: 900;
     }
     
-    .editor-panel.active {
-      display: flex;
-    }
-    
-    .editor-header {
-      padding: 12px 16px;
-      background: #333;
-      border-bottom: 1px solid #444;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 8px 8px 0 0;
-    }
-    
-    .editor-content {
-      flex: 1;
-      position: relative;
-      overflow-y: auto;
-    }
-    
-    .editor-content label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 12px;
-      color: #aaa;
-    }
-    
-    .editor-content input,
-    .editor-content textarea {
-      width: 100%;
-      background: #1a1a1a;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 4px;
-      padding: 8px;
-      font-family: inherit;
-    }
-    
-    .editor-content textarea {
-      font-family: 'Consolas', 'Monaco', monospace;
-      font-size: 12px;
-      min-height: 120px;
-      resize: vertical;
+    .minimap-viewport {
+      position: absolute;
+      border: 2px solid #2196F3;
+      background: rgba(33, 150, 243, 0.2);
+      pointer-events: none;
     }
     
     .node {
       position: absolute;
-      min-width: 120px;
-      height: 60px;
+      min-width: 140px;
+      min-height: 80px;
       border-radius: 8px;
-      padding: 8px 12px;
+      padding: 12px;
       cursor: move;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       color: #fff;
       font-size: 14px;
       font-weight: 500;
@@ -145,29 +139,136 @@
     }
     
     .node:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
     
     .node.selected {
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.2) !important;
+      border: 2px solid #fff !important;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
+    }
+    
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .node-type {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+    
+    .node-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+    }
+    
+    .node-input {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 4px 8px;
+      color: #fff;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    .node-input:focus {
+      outline: none;
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(0,0,0,0.5);
+    }
+    
+    .node-value {
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 16px;
+      color: #4CAF50;
+      word-break: break-all;
+      text-align: center;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    
+    .node-visualization {
+      width: 100%;
+      min-height: 60px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 4px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      max-height: 200px;
+    }
+    
+    .viz-bar {
+      height: 20px;
+      background: #2196F3;
+      border-radius: 2px;
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 11px;
     }
     
     .node-port {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #666;
+      border: 2px solid #333;
+      border-radius: 50%;
+      cursor: crosshair;
       transition: all 0.2s;
+      z-index: 10;
     }
     
     .node-port:hover {
-      background: #888 !important;
-      border-color: #fff !important;
+      background: #888;
+      border-color: #fff;
       transform: scale(1.2);
     }
     
+    .node-port.input {
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .node-port.output {
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .edge-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
     .edge-path {
+      fill: none;
+      stroke: #666;
+      stroke-width: 2;
+      opacity: 0.8;
       transition: stroke 0.2s;
     }
     
     .edge-path.animated {
+      stroke: #2196F3;
+      stroke-dasharray: 5,5;
       animation: dash 0.5s linear infinite;
     }
     
@@ -178,27 +279,874 @@
     }
     
     .connection-line {
+      stroke: #666;
+      stroke-width: 2;
+      stroke-dasharray: 5,5;
+      fill: none;
       pointer-events: none;
     }
     
     .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
       height: 24px;
-      background: #252525;
+      background: rgba(37, 37, 37, 0.95);
+      backdrop-filter: blur(10px);
       border-top: 1px solid #444;
       display: flex;
       align-items: center;
       padding: 0 16px;
       font-size: 12px;
       color: #888;
+      gap: 16px;
+      z-index: 1000;
+    }
+    
+    .info-panel {
+      position: fixed;
+      left: 20px;
+      top: 68px;
+      background: rgba(42, 42, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 16px;
+      max-width: 300px;
+      z-index: 900;
+    }
+    
+    .info-panel h3 {
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    
+    .info-panel p {
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #ccc;
+      line-height: 1.5;
+    }
+    
+    .info-panel code {
+      background: #1a1a1a;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    
+    /* Scrollbar styling */
+    .canvas-wrapper::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+    
+    .canvas-wrapper::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+    
+    .canvas-wrapper::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 6px;
+    }
+    
+    .canvas-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    
+    .canvas-wrapper::-webkit-scrollbar-corner {
+      background: #1a1a1a;
     }
   </style>
 </head>
 <body>
   <div id="root"></div>
   
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/rxjs@7/dist/bundles/rxjs.umd.min.js"></script>
-  <script src="./renderer.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+    const { Subject, BehaviorSubject, interval } = rxjs;
+    const { filter, map, switchMap, throttleTime, debounceTime } = rxjs.operators;
+    
+    // Типи вузлів
+    const NodeType = {
+      INPUT: 'input',
+      PROCESS: 'process',
+      OUTPUT: 'output',
+      AUTOMATON: 'automaton',
+      FILTER: 'filter',
+      VISUALIZER: 'visualizer'
+    };
+    
+    // Кольори для типів вузлів
+    const NodeColors = {
+      [NodeType.INPUT]: '#4CAF50',
+      [NodeType.PROCESS]: '#2196F3',
+      [NodeType.OUTPUT]: '#FF9800',
+      [NodeType.AUTOMATON]: '#9C27B0',
+      [NodeType.FILTER]: '#00BCD4',
+      [NodeType.VISUALIZER]: '#E91E63'
+    };
+    
+    // Клас вузла
+    class CanvasNode {
+      constructor(id, type, position, data = {}) {
+        this.id = id;
+        this.type = type;
+        this.position = position;
+        this.data = data;
+        this.input$ = new Subject();
+        this.output$ = new Subject();
+        this.state$ = new BehaviorSubject(data.initialState || null);
+        this.subscription = null;
+        
+        this.setupProcessing();
+      }
+      
+      setupProcessing() {
+        // Очищаємо попередню підписку
+        if (this.subscription) {
+          this.subscription.unsubscribe();
+        }
+        
+        switch (this.type) {
+          case NodeType.INPUT:
+            // Input може приймати значення від користувача і передавати далі
+            this.subscription = this.state$.subscribe(value => {
+              if (value !== null && value !== undefined) {
+                console.log(`Input ${this.id} sending:`, value);
+                this.output$.next(value);
+              }
+            });
+            break;
+            
+          case NodeType.PROCESS:
+            // Process обробляє вхідні дані
+            this.subscription = this.input$.subscribe(value => {
+              console.log(`Process ${this.id} received:`, value);
+              try {
+                const transform = this.data.transform || ((x) => {
+                  if (typeof x === 'number') return x * 2;
+                  if (typeof x === 'string') return x.toUpperCase();
+                  if (Array.isArray(x)) return x.map(item => item * 2);
+                  return x;
+                });
+                const result = transform(value);
+                console.log(`Process ${this.id} transformed to:`, result);
+                this.state$.next(result);
+                this.output$.next(result);
+              } catch (e) {
+                console.error('Transform error:', e);
+                this.state$.next('Error: ' + e.message);
+              }
+            });
+            break;
+            
+          case NodeType.FILTER:
+            // Фільтрація даних
+            this.subscription = this.input$.pipe(
+              filter(value => {
+                const filterFn = this.data.filter || ((x) => {
+                  if (typeof x === 'number') return x > 0;
+                  if (typeof x === 'string') return x.length > 0;
+                  return true;
+                });
+                const passed = filterFn(value);
+                console.log(`Filter ${this.id} received:`, value, 'passed:', passed);
+                return passed;
+              })
+            ).subscribe(value => {
+              this.state$.next(value);
+              this.output$.next(value);
+            });
+            break;
+            
+          case NodeType.OUTPUT:
+            // Output виводить дані в консоль
+            this.subscription = this.input$.subscribe(value => {
+              console.log(`🎯 Output [${this.id}]:`, value);
+              console.log(`  Type: ${typeof value}`);
+              console.log(`  Timestamp: ${new Date().toISOString()}`);
+              console.log('================================');
+              this.state$.next(value);
+            });
+            break;
+            
+          case NodeType.VISUALIZER:
+            // Visualizer відображає дані візуально
+            this.values = [];
+            this.subscription = this.input$.subscribe(value => {
+              console.log(`Visualizer ${this.id} received:`, value);
+              this.values.push({
+                value: value,
+                timestamp: Date.now()
+              });
+              if (this.values.length > 10) {
+                this.values.shift();
+              }
+              this.state$.next([...this.values]);
+            });
+            break;
+            
+          case NodeType.AUTOMATON:
+            // Клітинний автомат
+            this.subscription = this.input$.subscribe(value => {
+              const currentState = this.state$.value || [];
+              const newState = this.updateAutomatonState(currentState, value);
+              this.state$.next(newState);
+              this.output$.next(newState);
+            });
+            break;
+        }
+      }
+      
+      updateAutomatonState(state, input) {
+        if (!Array.isArray(state) || state.length === 0) {
+          state = Array(10).fill(0);
+          state[5] = 1;
+        }
+        
+        const newState = [...state];
+        for (let i = 1; i < state.length - 1; i++) {
+          const left = state[i - 1];
+          const center = state[i];
+          const right = state[i + 1];
+          const sum = left + center + right;
+          newState[i] = sum === 1 || sum === 2 ? 1 : 0;
+        }
+        
+        return newState;
+      }
+      
+      updateValue(value) {
+        if (this.type === NodeType.INPUT) {
+          console.log(`Input ${this.id} updating value to:`, value);
+          this.state$.next(value);
+        }
+      }
+      
+      updateTransform(code) {
+        if (this.type === NodeType.PROCESS) {
+          try {
+            this.data.transform = new Function('x', code);
+            const lastValue = this.state$.value;
+            if (lastValue !== null) {
+              this.input$.next(lastValue);
+            }
+          } catch (e) {
+            console.error('Invalid transform code:', e);
+          }
+        }
+      }
+      
+      destroy() {
+        if (this.subscription) {
+          this.subscription.unsubscribe();
+        }
+        this.input$.complete();
+        this.output$.complete();
+        this.state$.complete();
+      }
+    }
+    
+    // Клас з'єднання
+    class Edge {
+      constructor(id, sourceId, targetId) {
+        this.id = id;
+        this.sourceId = sourceId;
+        this.targetId = targetId;
+        this.subscription = null;
+      }
+      
+      connect(nodes) {
+        const source = nodes.get(this.sourceId);
+        const target = nodes.get(this.targetId);
+        
+        if (source && target) {
+          console.log(`Connecting ${this.sourceId} -> ${this.targetId}`);
+          this.subscription = source.output$.subscribe(value => {
+            console.log(`Edge ${this.id} transmitting:`, value);
+            target.input$.next(value);
+          });
+        }
+      }
+      
+      disconnect() {
+        if (this.subscription) {
+          this.subscription.unsubscribe();
+          this.subscription = null;
+        }
+      }
+    }
+    
+    // Компонент вузла
+    const NodeComponent = ({ node, selected, onSelect, onDelete, onUpdateValue, onPortClick, onMouseDown }) => {
+      const [inputValue, setInputValue] = useState('');
+      const [currentState, setCurrentState] = useState(node.state$.value);
+      
+      useEffect(() => {
+        const subscription = node.state$.subscribe(value => {
+          setCurrentState(value);
+        });
+        
+        return () => subscription.unsubscribe();
+      }, [node]);
+      
+      const handleInputChange = (e) => {
+        const value = e.target.value;
+        setInputValue(value);
+      };
+      
+      const handleInputSubmit = (e) => {
+        if (e.key === 'Enter') {
+          let value = inputValue;
+          if (!isNaN(parseFloat(inputValue))) {
+            value = parseFloat(inputValue);
+          }
+          onUpdateValue(node.id, value);
+        }
+      };
+      
+      const handlePortClick = (e, portType) => {
+        e.stopPropagation();
+        onPortClick(node.id, portType);
+      };
+      
+      const renderNodeContent = () => {
+        switch (node.type) {
+          case NodeType.INPUT:
+            return (
+              <input
+                className="node-input"
+                type="text"
+                placeholder="Enter value..."
+                value={inputValue}
+                onChange={handleInputChange}
+                onKeyPress={handleInputSubmit}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+              />
+            );
+            
+          case NodeType.PROCESS:
+          case NodeType.FILTER:
+          case NodeType.OUTPUT:
+            return (
+              <div className="node-value">
+                {currentState !== null ? 
+                  (typeof currentState === 'object' ? 
+                    JSON.stringify(currentState) : 
+                    String(currentState)) : 
+                  '—'}
+              </div>
+            );
+            
+          case NodeType.VISUALIZER:
+            const values = currentState || [];
+            return (
+              <div className="node-visualization">
+                {values.map((item, index) => {
+                  const width = typeof item.value === 'number' ? 
+                    Math.min(100, Math.abs(item.value)) : 50;
+                  return (
+                    <div 
+                      key={index}
+                      className="viz-bar"
+                      style={{ 
+                        width: `${width}%`,
+                        opacity: 1 - (index / values.length) * 0.5
+                      }}
+                    >
+                      {String(item.value).slice(0, 10)}
+                    </div>
+                  );
+                })}
+                {values.length === 0 && <div style={{ opacity: 0.5 }}>No data</div>}
+              </div>
+            );
+            
+          case NodeType.AUTOMATON:
+            const cells = currentState || [];
+            return (
+              <div style={{ display: 'flex', gap: 2 }}>
+                {cells.map((cell, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: 8,
+                      height: 8,
+                      background: cell ? '#4CAF50' : '#333',
+                      borderRadius: 1
+                    }}
+                  />
+                ))}
+              </div>
+            );
+            
+          default:
+            return null;
+        }
+      };
+      
+      return (
+        <div
+          className={`node ${selected ? 'selected' : ''}`}
+          style={{
+            left: node.position.x,
+            top: node.position.y,
+            background: NodeColors[node.type],
+            border: selected ? '2px solid #fff' : '1px solid #333',
+            minWidth: node.type === NodeType.VISUALIZER ? '200px' : '140px'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(node.id);
+          }}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            if (window.confirm('Delete this node?')) {
+              onDelete(node.id);
+            }
+          }}
+          onMouseDown={(e) => onMouseDown(e, node.id)}
+        >
+          <div className="node-header">
+            <div>{node.type.toUpperCase()}</div>
+            <div className="node-type">{node.id.slice(0, 8)}</div>
+          </div>
+          <div className="node-content">
+            {renderNodeContent()}
+          </div>
+          
+          {/* Порти */}
+          {node.type !== NodeType.INPUT && (
+            <div 
+              className="node-port input"
+              onClick={(e) => handlePortClick(e, 'input')}
+              onMouseDown={(e) => e.stopPropagation()}
+            />
+          )}
+          {node.type !== NodeType.OUTPUT && (
+            <div 
+              className="node-port output"
+              onClick={(e) => handlePortClick(e, 'output')}
+              onMouseDown={(e) => e.stopPropagation()}
+            />
+          )}
+        </div>
+      );
+    };
+    
+    // Основний компонент
+    function CanvasOS() {
+      const [nodes, setNodes] = useState(new Map());
+      const [edges, setEdges] = useState(new Map());
+      const [selectedNode, setSelectedNode] = useState(null);
+      const [showInfo, setShowInfo] = useState(true);
+      const [simulationRunning, setSimulationRunning] = useState(false);
+      const [draggedNode, setDraggedNode] = useState(null);
+      const [connectingFrom, setConnectingFrom] = useState(null);
+      const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+      const [scrollPos, setScrollPos] = useState({ x: 0, y: 0 });
+      
+      const canvasRef = useRef(null);
+      const wrapperRef = useRef(null);
+      const nodesRef = useRef(nodes);
+      const edgesRef = useRef(edges);
+      
+      useEffect(() => {
+        nodesRef.current = nodes;
+        edgesRef.current = edges;
+      }, [nodes, edges]);
+      
+      // Центрування канви при завантаженні
+      useEffect(() => {
+        if (wrapperRef.current) {
+          const wrapper = wrapperRef.current;
+          wrapper.scrollLeft = (5000 - wrapper.clientWidth) / 2;
+          wrapper.scrollTop = (5000 - wrapper.clientHeight) / 2;
+          setScrollPos({
+            x: wrapper.scrollLeft,
+            y: wrapper.scrollTop
+          });
+        }
+      }, []);
+      
+      // Відстеження скролу
+      const handleScroll = useCallback(() => {
+        if (wrapperRef.current) {
+          setScrollPos({
+            x: wrapperRef.current.scrollLeft,
+            y: wrapperRef.current.scrollTop
+          });
+        }
+      }, []);
+      
+      // Створення нового вузла
+      const createNode = useCallback((type, position) => {
+        const id = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const node = new CanvasNode(id, type, position);
+        
+        setNodes(prev => {
+          const newMap = new Map(prev);
+          newMap.set(id, node);
+          return newMap;
+        });
+        
+        return id;
+      }, []);
+      
+      // Створення з'єднання
+      const createEdge = useCallback((sourceId, targetId) => {
+        if (sourceId === targetId) return;
+        
+        const existingEdge = Array.from(edgesRef.current.values()).find(
+          edge => edge.sourceId === sourceId && edge.targetId === targetId
+        );
+        
+        if (existingEdge) return;
+        
+        const id = `edge-${Date.now()}`;
+        const edge = new Edge(id, sourceId, targetId);
+        
+        edge.connect(nodesRef.current);
+        
+        setEdges(prev => {
+          const newMap = new Map(prev);
+          newMap.set(id, edge);
+          return newMap;
+        });
+      }, []);
+      
+      // Видалення вузла
+      const deleteNode = useCallback((nodeId) => {
+        const node = nodesRef.current.get(nodeId);
+        if (node) {
+          node.destroy();
+          
+          edgesRef.current.forEach((edge, edgeId) => {
+            if (edge.sourceId === nodeId || edge.targetId === nodeId) {
+              edge.disconnect();
+              setEdges(prev => {
+                const newMap = new Map(prev);
+                newMap.delete(edgeId);
+                return newMap;
+              });
+            }
+          });
+          
+          setNodes(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(nodeId);
+            return newMap;
+          });
+          
+          if (selectedNode === nodeId) {
+            setSelectedNode(null);
+          }
+        }
+      }, [selectedNode]);
+      
+      // Оновлення значення вузла
+      const updateNodeValue = useCallback((nodeId, value) => {
+        const node = nodesRef.current.get(nodeId);
+        if (node) {
+          node.updateValue(value);
+        }
+      }, []);
+      
+      // Обробка кліку на порт
+      const handlePortClick = useCallback((nodeId, portType) => {
+        console.log('Port clicked:', nodeId, portType);
+        if (portType === 'output') {
+          setConnectingFrom(nodeId);
+        } else if (portType === 'input' && connectingFrom && connectingFrom !== nodeId) {
+          createEdge(connectingFrom, nodeId);
+          setConnectingFrom(null);
+        }
+      }, [connectingFrom, createEdge]);
+      
+      // Створення початкового прикладу
+      const createExample = useCallback(() => {
+        const input1 = createNode(NodeType.INPUT, { x: 2200, y: 2400 });
+        const process1 = createNode(NodeType.PROCESS, { x: 2400, y: 2400 });
+        const output1 = createNode(NodeType.OUTPUT, { x: 2600, y: 2300 });
+        const viz1 = createNode(NodeType.VISUALIZER, { x: 2600, y: 2500 });
+        
+        setTimeout(() => {
+          createEdge(input1, process1);
+          createEdge(process1, output1);
+          createEdge(process1, viz1);
+        }, 100);
+      }, [createNode, createEdge]);
+      
+      // Обробка натискання на канву
+      const handleCanvasClick = useCallback((e) => {
+        if (e.target === canvasRef.current) {
+          setSelectedNode(null);
+          setConnectingFrom(null);
+        }
+      }, []);
+      
+      // Обробка подвійного кліку
+      const handleCanvasDoubleClick = useCallback((e) => {
+        if (e.target === canvasRef.current) {
+          const rect = canvasRef.current.getBoundingClientRect();
+          const position = {
+            x: e.clientX - rect.left + scrollPos.x,
+            y: e.clientY - rect.top + scrollPos.y
+          };
+          createNode(NodeType.PROCESS, position);
+        }
+      }, [createNode, scrollPos]);
+      
+      // Drag & Drop для вузлів
+      const handleNodeMouseDown = useCallback((e, nodeId) => {
+        if (!e.target.classList.contains('node-port') && !e.target.classList.contains('node-input')) {
+          const node = nodesRef.current.get(nodeId);
+          if (node) {
+            const rect = canvasRef.current.getBoundingClientRect();
+            setDraggedNode({
+              id: nodeId,
+              offsetX: e.clientX - rect.left + scrollPos.x - node.position.x,
+              offsetY: e.clientY - rect.top + scrollPos.y - node.position.y
+            });
+          }
+        }
+      }, [scrollPos]);
+      
+      const handleMouseMove = useCallback((e) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left + scrollPos.x;
+        const y = e.clientY - rect.top + scrollPos.y;
+        setMousePos({ x, y });
+        
+        if (draggedNode) {
+          const newX = x - draggedNode.offsetX;
+          const newY = y - draggedNode.offsetY;
+          
+          setNodes(prev => {
+            const newMap = new Map(prev);
+            const node = newMap.get(draggedNode.id);
+            if (node) {
+              node.position = { 
+                x: Math.max(0, Math.min(4900, newX)), 
+                y: Math.max(0, Math.min(4900, newY)) 
+              };
+            }
+            return newMap;
+          });
+        }
+      }, [draggedNode, scrollPos]);
+      
+      const handleMouseUp = useCallback(() => {
+        setDraggedNode(null);
+      }, []);
+      
+      // Додавання глобальних обробників
+      useEffect(() => {
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        
+        return () => {
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+        };
+      }, [handleMouseMove, handleMouseUp]);
+      
+      // Обчислення позицій портів
+      const getPortPosition = (nodeId, portType) => {
+        const node = nodes.get(nodeId);
+        if (!node) return { x: 0, y: 0 };
+        
+        const nodeWidth = node.type === NodeType.VISUALIZER ? 200 : 140;
+        return {
+          x: node.position.x + (portType === 'output' ? nodeWidth : 0),
+          y: node.position.y + 40
+        };
+      };
+      
+      // Рендер SVG для з'єднань
+      const renderEdges = () => {
+        const paths = [];
+        
+        edges.forEach((edge, id) => {
+          const sourcePos = getPortPosition(edge.sourceId, 'output');
+          const targetPos = getPortPosition(edge.targetId, 'input');
+          
+          const d = `M ${sourcePos.x} ${sourcePos.y} C ${sourcePos.x + 100} ${sourcePos.y}, ${targetPos.x - 100} ${targetPos.y}, ${targetPos.x} ${targetPos.y}`;
+          
+          paths.push(
+            <path
+              key={id}
+              d={d}
+              className={`edge-path ${simulationRunning ? 'animated' : ''}`}
+            />
+          );
+        });
+        
+        if (connectingFrom) {
+          const sourcePos = getPortPosition(connectingFrom, 'output');
+          const d = `M ${sourcePos.x} ${sourcePos.y} L ${mousePos.x} ${mousePos.y}`;
+          
+          paths.push(
+            <path
+              key="connecting"
+              d={d}
+              className="connection-line"
+            />
+          );
+        }
+        
+        return paths;
+      };
+      
+      // Мінікарта
+      const renderMinimap = () => {
+        const scale = 0.03;
+        const viewportWidth = wrapperRef.current?.clientWidth || 0;
+        const viewportHeight = wrapperRef.current?.clientHeight || 0;
+        
+        return (
+          <div className="minimap">
+            <div
+              className="minimap-viewport"
+              style={{
+                left: scrollPos.x * scale,
+                top: scrollPos.y * scale,
+                width: viewportWidth * scale,
+                height: viewportHeight * scale
+              }}
+            />
+            {Array.from(nodes.values()).map(node => (
+              <div
+                key={node.id}
+                style={{
+                  position: 'absolute',
+                  left: node.position.x * scale,
+                  top: node.position.y * scale,
+                  width: 4,
+                  height: 3,
+                  background: NodeColors[node.type],
+                  borderRadius: 1
+                }}
+              />
+            ))}
+          </div>
+        );
+      };
+      
+      return (
+        <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+          {/* Toolbar */}
+          <div className="toolbar">
+            <button onClick={() => createNode(NodeType.INPUT, { x: scrollPos.x + 100, y: scrollPos.y + 100 })}>
+              + Input
+            </button>
+            <button onClick={() => createNode(NodeType.PROCESS, { x: scrollPos.x + 300, y: scrollPos.y + 100 })}>
+              + Process
+            </button>
+            <button onClick={() => createNode(NodeType.FILTER, { x: scrollPos.x + 300, y: scrollPos.y + 200 })}>
+              + Filter
+            </button>
+            <button onClick={() => createNode(NodeType.OUTPUT, { x: scrollPos.x + 500, y: scrollPos.y + 100 })}>
+              + Output
+            </button>
+            <button onClick={() => createNode(NodeType.VISUALIZER, { x: scrollPos.x + 500, y: scrollPos.y + 200 })}>
+              + Visualizer
+            </button>
+            <button onClick={() => createNode(NodeType.AUTOMATON, { x: scrollPos.x + 300, y: scrollPos.y + 300 })}>
+              + Automaton
+            </button>
+            <div className="divider" />
+            <button onClick={createExample}>
+              📋 Example
+            </button>
+            <button onClick={() => setSimulationRunning(!simulationRunning)}>
+              {simulationRunning ? '⏸ Pause' : '▶ Run'}
+            </button>
+            <button onClick={() => setShowInfo(!showInfo)}>
+              ℹ️ Info
+            </button>
+            <div className="divider" />
+            <button onClick={() => {
+              nodes.forEach(node => node.destroy());
+              edges.forEach(edge => edge.disconnect());
+              setNodes(new Map());
+              setEdges(new Map());
+              setSelectedNode(null);
+            }}>
+              🗑️ Clear All
+            </button>
+          </div>
+          
+          {/* Canvas */}
+          <div 
+            ref={wrapperRef}
+            className="canvas-wrapper"
+            onScroll={handleScroll}
+          >
+            <div 
+              ref={canvasRef}
+              className="canvas-container"
+              onClick={handleCanvasClick}
+              onDoubleClick={handleCanvasDoubleClick}
+            >
+              {/* SVG для з'єднань */}
+              <svg className="edge-svg">
+                {renderEdges()}
+              </svg>
+              
+              {/* Вузли */}
+              {Array.from(nodes.values()).map(node => (
+                <NodeComponent
+                  key={node.id}
+                  node={node}
+                  selected={selectedNode === node.id}
+                  onSelect={setSelectedNode}
+                  onDelete={deleteNode}
+                  onUpdateValue={updateNodeValue}
+                  onPortClick={handlePortClick}
+                  onMouseDown={handleNodeMouseDown}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Мінікарта */}
+          {renderMinimap()}
+          
+          {/* Info Panel */}
+          {showInfo && (
+            <div className="info-panel">
+              <h3>🎯 Canvas OS MVP</h3>
+              <p><strong>Нескінченна канва:</strong> 5000x5000px з можливістю скролу</p>
+              <p><strong>Input:</strong> Введіть значення і натисніть Enter</p>
+              <p><strong>Process:</strong> Обробляє вхідні дані (x2 для чисел, uppercase для тексту)</p>
+              <p><strong>Output:</strong> Виводить дані в консоль (F12)</p>
+              <p><strong>Visualizer:</strong> Відображає останні 10 значень</p>
+              <p><strong>З'єднання:</strong> Клік на вихідний порт → клік на вхідний</p>
+              <p><strong>Подвійний клік:</strong> Створити Process вузол</p>
+              <p><strong>Debug:</strong> Відкрийте консоль (F12) для перегляду потоку даних</p>
+            </div>
+          )}
+          
+          {/* Status Bar */}
+          <div className="status-bar">
+            <span>Nodes: {nodes.size}</span>
+            <span>Edges: {edges.size}</span>
+            <span>Position: {Math.round(scrollPos.x)}, {Math.round(scrollPos.y)}</span>
+            <span>Status: {simulationRunning ? '🟢 Running' : '⚪ Stopped'}</span>
+            {connectingFrom && <span>Connecting from: {connectingFrom.slice(0, 12)}...</span>}
+            {draggedNode && <span>Dragging node...</span>}
+          </div>
+        </div>
+      );
+    }
+    
+    // Рендеринг
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<CanvasOS />);
+  </script>
 </body>
 </html>
