@@ -1,8 +1,8 @@
 // src/renderer/nodes/InputNode.js
 // Вузол введення даних
 
-import { CanvasNode } from '../core/Node.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { NodeType } from '@core/constants.js';
 import { interval, fromEvent, merge } from 'rxjs';
 import { map, throttleTime } from 'rxjs/operators';
 

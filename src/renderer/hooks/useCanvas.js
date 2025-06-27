@@ -2,7 +2,7 @@
 // Хук для управління канвою (pan, zoom, viewport)
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { CanvasConfig } from '../core/constants.js';
+import { CanvasConfig } from '@core/constants.js';
 
 export function useCanvas(wrapperRef) {
   const [viewportPos, setViewportPos] = useState({ x: 0, y: 0 });

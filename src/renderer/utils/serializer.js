@@ -1,15 +1,15 @@
 // src/renderer/utils/serializer.js
 // Утиліти для серіалізації/десеріалізації графа Canvas OS
 
-import { CanvasNode } from '../core/Node.js';
-import { Edge } from '../core/Edge.js';
-import { InputNode } from '../nodes/InputNode.js';
-import { ProcessNode } from '../nodes/ProcessNode.js';
-import { OutputNode } from '../nodes/OutputNode.js';
-import { FilterNode } from '../nodes/FilterNode.js';
-import { VisualizerNode } from '../nodes/VisualizerNode.js';
-import { AutomatonNode } from '../nodes/AutomatonNode.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { Edge } from '@core/Edge.js';
+import { InputNode } from '@nodes/InputNode.js';
+import { ProcessNode } from '@nodes/ProcessNode.js';
+import { OutputNode } from '@nodes/OutputNode.js';
+import { FilterNode } from '@nodes/FilterNode.js';
+import { VisualizerNode } from '@nodes/VisualizerNode.js';
+import { AutomatonNode } from '@nodes/AutomatonNode.js';
+import { NodeType } from '@core/constants.js';
 
 // Мапа типів вузлів на класи
 const NODE_CLASS_MAP = {

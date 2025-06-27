@@ -2,7 +2,7 @@
 // Менеджер Web Workers для Canvas OS
 
 import { Subject } from 'rxjs';
-import { Limits } from '../core/constants.js';
+import { Limits } from '@core/constants.js';
 
 // Клас для управління пулом воркерів
 export class WorkerManager {

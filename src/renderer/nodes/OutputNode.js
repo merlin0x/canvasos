@@ -1,8 +1,8 @@
 // src/renderer/nodes/OutputNode.js
 // Вузол виведення даних
 
-import { CanvasNode } from '../core/Node.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { NodeType } from '@core/constants.js';
 
 export class OutputNode extends CanvasNode {
   constructor(id, position, data = {}) {

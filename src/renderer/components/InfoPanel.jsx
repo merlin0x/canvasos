@@ -2,7 +2,7 @@
 // Інформаційна панель Canvas OS
 
 import React, { useState, useEffect } from 'react';
-import { Hotkeys } from '../core/constants.js';
+import { Hotkeys } from '@core/constants.js';
 
 export function InfoPanel({ onClose, graphManager }) {
   const [activeTab, setActiveTab] = useState('help');

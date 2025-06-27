@@ -2,7 +2,7 @@
 // Базовий клас вузла Canvas OS
 
 import { Subject, BehaviorSubject } from 'rxjs';
-import { NodeType } from './constants.js';
+import { NodeType } from '@core/constants.js';
 
 export class CanvasNode {
   constructor(id, type, position, data = {}) {

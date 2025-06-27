@@ -2,7 +2,7 @@
 // Панель інструментів Canvas OS
 
 import React, { useState } from 'react';
-import { NodeType } from '../core/constants.js';
+import { NodeType } from '@core/constants.js';
 
 export function Toolbar({ 
   onCommand, 

@@ -3,12 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;">
   <title>Canvas OS - Visual Programming Environment</title>
-  
-  <!-- Стилі -->
-  <link rel="stylesheet" href="styles/main.css">
-  <link rel="stylesheet" href="styles/nodes.css">
-  <link rel="stylesheet" href="styles/components.css">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='8' cy='8' r='6' fill='%234CAF50'/%3E%3Ccircle cx='24' cy='8' r='6' fill='%232196F3'/%3E%3Ccircle cx='16' cy='24' r='6' fill='%23FF9800'/%3E%3Cpath d='M8 8 L24 8 M16 24 L8 8 M16 24 L24 8' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E">
@@ -39,113 +35,17 @@
     </div>
   </div>
   
-  <!-- Глобальні скрипти -->
-  <script>
-    // Конфігурація для імпорт мапів
-    window.esmsInitOptions = {
-      shimMode: true,
-      fetch: window.fetch,
-      skip: /^https:\/\/unpkg\.com/
-    };
-  </script>
-  
-  <!-- ES Module Shims для підтримки імпорт мапів -->
-  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-  
-  <!-- Імпорт мапи -->
-  <script type="importmap">
-  {
-    "imports": {
-      "react": "https://unpkg.com/@esm/react@18.2.0",
-      "react-dom": "https://unpkg.com/@esm/react-dom@18.2.0",
-      "react-dom/client": "https://unpkg.com/@esm/react-dom@18.2.0/client",
-      "rxjs": "https://unpkg.com/@esm/rxjs@7.8.1",
-      "rxjs/operators": "https://unpkg.com/@esm/rxjs@7.8.1/operators"
-    }
-  }
-  </script>
-  
-  <!-- Поліфіли та утиліти -->
-  <script>
-    // Глобальні утиліти
-    window.CanvasOSUtils = {
-      // Дебаунс функція
-      debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-          const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-          };
-          clearTimeout(timeout);
-          timeout = setTimeout(later, wait);
-        };
-      },
-      
-      // Throttle функція
-      throttle(func, limit) {
-        let inThrottle;
-        return function(...args) {
-          if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-          }
-        };
-      },
-      
-      // Генерація ID
-      generateId(prefix = 'id') {
-        return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      },
-      
-      // Глибоке клонування
-      deepClone(obj) {
-        return JSON.parse(JSON.stringify(obj));
-      }
-    };
-    
-    // Обробка помилок
-    window.addEventListener('error', (event) => {
-      console.error('Global error:', event.error);
-      
-      // Приховуємо екран завантаження при помилці
-      const loadingScreen = document.querySelector('.loading-screen');
-      if (loadingScreen) {
-        loadingScreen.style.display = 'none';
-      }
-      
-      // Показуємо повідомлення про помилку
-      const root = document.getElementById('root');
-      if (root && !document.querySelector('.error-screen')) {
-        root.innerHTML += `
-          <div class="error-screen">
-            <div class="error-content">
-              <h2>⚠️ Виникла помилка</h2>
-              <p>${event.error?.message || 'Невідома помилка'}</p>
-              <button onclick="location.reload()">Перезавантажити</button>
-            </div>
-          </div>
-        `;
-      }
-    });
-    
-    // Показ статусу завантаження модулів
-    let loadedModules = 0;
-    const totalModules = 5; // Приблизна кількість основних модулів
-    
-    window.updateLoadingProgress = () => {
-      loadedModules++;
-      const progress = Math.min((loadedModules / totalModules) * 100, 100);
-      const loadingText = document.querySelector('.loading-screen p');
-      if (loadingText) {
-        loadingText.textContent = `Завантаження... ${Math.round(progress)}%`;
-      }
-    };
-  </script>
-  
   <!-- Стилі для екрану завантаження -->
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      overflow: hidden;
+    }
+    
     .loading-screen {
       position: fixed;
       top: 0;
@@ -230,71 +130,9 @@
     .error-content button:hover {
       background: #d32f2f;
     }
-    
-    /* Повідомлення */
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #333;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      transform: translateX(400px);
-      transition: transform 0.3s;
-      z-index: 2000;
-      max-width: 300px;
-    }
-    
-    .notification.show {
-      transform: translateX(0);
-    }
-    
-    .notification-success {
-      background: #4CAF50;
-    }
-    
-    .notification-error {
-      background: #f44336;
-    }
-    
-    .notification-warning {
-      background: #FF9800;
-    }
-    
-    .notification-info {
-      background: #2196F3;
-    }
   </style>
   
-  <!-- Основний модуль додатку -->
-  <script type="module">
-    // Приховання екрану завантаження після завантаження
-    window.addEventListener('DOMContentLoaded', () => {
-      // Імпортуємо основний модуль
-      import('./index.js').then(() => {
-        // Затримка для плавної анімації
-        setTimeout(() => {
-          const loadingScreen = document.querySelector('.loading-screen');
-          if (loadingScreen) {
-            loadingScreen.classList.add('fade-out');
-            setTimeout(() => {
-              loadingScreen.style.display = 'none';
-            }, 500);
-          }
-        }, 500);
-      }).catch(error => {
-        console.error('Failed to load application:', error);
-      });
-    });
-    
-    // Прогресивне покращення
-    if ('serviceWorker' in navigator && location.protocol === 'https:') {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
-        console.log('Service Worker registration skipped');
-      });
-    }
-  </script>
+  <!-- Vite завантажить модуль -->
+  <script type="module" src="./index.jsx"></script>
 </body>
 </html>

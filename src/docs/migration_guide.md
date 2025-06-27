@@ -82,8 +82,8 @@ npm run build
 
 ```javascript
 // src/renderer/nodes/MyCustomNode.js
-import { CanvasNode } from '../core/Node.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { NodeType } from '@core/constants.js';
 
 // Додайте новий тип в constants.js
 // NodeType.CUSTOM = 'custom';
@@ -174,7 +174,7 @@ function NodeComponent() { ... }
 export class CanvasNode { ... }
 
 // components/Node.js
-import { CanvasNode } from '../core/Node.js';
+import { CanvasNode } from '@core/Node.js';
 export function NodeComponent() { ... }
 ```
 
@@ -191,10 +191,10 @@ export function NodeComponent() { ... }
 Переконайтеся, що вказуєте розширення `.js` в імпортах:
 ```javascript
 // ✅ Правильно
-import { Node } from './Node.js';
+import { Node } from '@/Node.js';
 
 // ❌ Неправильно
-import { Node } from './Node';
+import { Node } from '@/Node';
 ```
 
 ### Помилка CORS при локальній розробці

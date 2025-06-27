@@ -2,7 +2,7 @@
 // React компонент для відображення з'єднання
 
 import React, { memo, useMemo } from 'react';
-import { EdgeConfig } from '../core/constants.js';
+import { EdgeConfig } from '@core/constants.js';
 
 export const EdgeComponent = memo(({ 
   edge, 

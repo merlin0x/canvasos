@@ -1,7 +1,7 @@
 // src/main/preload.js
 // Preload скрипт для безпечної комунікації між процесами
 
-const { contextBridge, ipcRenderer } = require('electron');
+import { contextBridge, ipcRenderer } from 'electron';
 
 // Безпечний API для renderer процесу
 contextBridge.exposeInMainWorld('canvasAPI', {
@@ -15,11 +15,6 @@ contextBridge.exposeInMainWorld('canvasAPI', {
   file: {
     save: (filePath, data) => ipcRenderer.invoke('file:save', filePath, data),
     read: (filePath) => ipcRenderer.invoke('file:read', filePath)
-  },
-  
-  // Управління воркерами
-  worker: {
-    create: (code) => ipcRenderer.invoke('worker:create', code)
   },
   
   // Системна інформація
@@ -48,7 +43,14 @@ contextBridge.exposeInMainWorld('canvasAPI', {
     ];
     
     if (validChannels.includes(channel)) {
-      ipcRenderer.on(channel, (event, ...args) => callback(...args));
+      // Обгортка для видалення event з callback
+      const subscription = (event, ...args) => callback(...args);
+      ipcRenderer.on(channel, subscription);
+      
+      // Повертаємо функцію для відписки
+      return () => {
+        ipcRenderer.removeListener(channel, subscription);
+      };
     }
   },
   
@@ -64,3 +66,11 @@ contextBridge.exposeInMainWorld('versions', {
   chrome: process.versions.chrome,
   electron: process.versions.electron
 });
+
+// Налаштування для розробки
+if (process.env.NODE_ENV === 'development') {
+  contextBridge.exposeInMainWorld('devTools', {
+    reload: () => ipcRenderer.send('dev-reload'),
+    openDevTools: () => ipcRenderer.send('dev-open-devtools')
+  });
+}

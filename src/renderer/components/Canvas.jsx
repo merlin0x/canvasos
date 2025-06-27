@@ -2,18 +2,18 @@
 // Основний компонент канви
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { NodeComponent } from './Node.js';
-import { EdgeComponent } from './Edge.js';
-import { Toolbar } from './Toolbar.js';
-import { StatusBar } from './StatusBar.js';
-import { InfoPanel } from './InfoPanel.js';
-import { Editor } from './Editor.js';
-import { Minimap } from './Minimap.js';
-import { useCanvas } from '../hooks/useCanvas.js';
-import { useNodes } from '../hooks/useNodes.js';
-import { useEdges } from '../hooks/useEdges.js';
-import { useDragDrop } from '../hooks/useDragDrop.js';
-import { CanvasConfig } from '../core/constants.js';
+import { NodeComponent } from '@components/Node.jsx';
+import { EdgeComponent } from '@components/Edge.jsx';
+import { Toolbar } from '@components/Toolbar.jsx';
+import { StatusBar } from '@components/StatusBar.jsx';
+import { InfoPanel } from '@components/InfoPanel.jsx';
+import { Editor } from '@components/Editor.jsx';
+import { Minimap } from '@components/Minimap.jsx';
+import { useCanvas } from '@hooks/useCanvas.js';
+import { useNodes } from '@hooks/useNodes.js';
+import { useEdges } from '@hooks/useEdges.js';
+import { useDragDrop } from '@hooks/useDragDrop.js';
+import { CanvasConfig } from '@core/constants.js';
 
 export function Canvas({ graphManager, settings, onSettingsChange }) {
   const canvasRef = useRef(null);

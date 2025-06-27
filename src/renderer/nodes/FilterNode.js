@@ -1,8 +1,8 @@
 // src/renderer/nodes/FilterNode.js
 // Вузол фільтрації даних
 
-import { CanvasNode } from '../core/Node.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { NodeType } from '@core/constants.js';
 
 export class FilterNode extends CanvasNode {
   constructor(id, position, data = {}) {

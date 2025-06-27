@@ -2,7 +2,7 @@
 // Мінікарта для навігації по канві
 
 import React, { useRef, useEffect, useState } from 'react';
-import { NodeColors } from '../core/constants.js';
+import { NodeColors } from '@core/constants.js';
 
 export function Minimap({ 
   nodes, 

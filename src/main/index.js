@@ -1,16 +1,25 @@
 // src/main/index.js
 // Основний процес Electron для Canvas OS
 
-const { app, BrowserWindow, ipcMain, Menu, dialog, shell } = require('electron');
-const path = require('path');
-const fs = require('fs').promises;
+import { app, BrowserWindow, ipcMain, Menu, dialog, shell } from 'electron';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { promises as fs } from 'fs';
+
+// ESM обхід для __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 let mainWindow;
 let unsavedChanges = false;
 
 // Налаштування для різних платформ
 const isMac = process.platform === 'darwin';
-const isDev = process.argv.includes('--dev');
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Визначення URL для завантаження
+const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+const VITE_DIST = process.env.VITE_DIST;
 
 function createWindow() {
   // Створення вікна браузера
@@ -20,22 +29,24 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: join(__dirname, 'preload.js'),
       contextIsolation: true,
       sandbox: true,
       nodeIntegration: false
     },
-    icon: path.join(__dirname, '../renderer/assets/icon.png'),
+    icon: join(__dirname, '../../build/icon.png'),
     titleBarStyle: isMac ? 'hiddenInset' : 'default',
     backgroundColor: '#0a0a0a'
   });
 
   // Завантаження додатку
-  if (isDev) {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+  if (VITE_DEV_SERVER_URL) {
+    // Режим розробки - завантаження з Vite сервера
+    mainWindow.loadURL(VITE_DEV_SERVER_URL);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    // Продакшн - завантаження з файлу
+    mainWindow.loadFile(join(VITE_DIST, 'index.html'));
   }
 
   // Обробка закриття вікна
@@ -65,6 +76,11 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+  
+  // Обробка помилок завантаження
+  mainWindow.webContents.on('did-fail-load', () => {
+    console.error('Failed to load app');
+  });
 }
 
 // Створення меню
@@ -77,31 +93,31 @@ function createMenu() {
         {
           label: 'Новий',
           accelerator: 'CmdOrCtrl+N',
-          click: () => mainWindow.webContents.send('menu-new')
+          click: () => mainWindow?.webContents.send('menu-new')
         },
         {
           label: 'Відкрити...',
           accelerator: 'CmdOrCtrl+O',
-          click: () => mainWindow.webContents.send('menu-open')
+          click: () => mainWindow?.webContents.send('menu-open')
         },
         { type: 'separator' },
         {
           label: 'Зберегти',
           accelerator: 'CmdOrCtrl+S',
-          click: () => mainWindow.webContents.send('menu-save')
+          click: () => mainWindow?.webContents.send('menu-save')
         },
         {
           label: 'Зберегти як...',
           accelerator: 'CmdOrCtrl+Shift+S',
-          click: () => mainWindow.webContents.send('menu-save-as')
+          click: () => mainWindow?.webContents.send('menu-save-as')
         },
         { type: 'separator' },
         {
           label: 'Експортувати',
           submenu: [
-            { label: 'JSON', click: () => mainWindow.webContents.send('menu-export', 'json') },
-            { label: 'PNG', click: () => mainWindow.webContents.send('menu-export', 'png') },
-            { label: 'SVG', click: () => mainWindow.webContents.send('menu-export', 'svg') }
+            { label: 'JSON', click: () => mainWindow?.webContents.send('menu-export', 'json') },
+            { label: 'PNG', click: () => mainWindow?.webContents.send('menu-export', 'png') },
+            { label: 'SVG', click: () => mainWindow?.webContents.send('menu-export', 'svg') }
           ]
         },
         { type: 'separator' },
@@ -115,23 +131,23 @@ function createMenu() {
         {
           label: 'Скасувати',
           accelerator: 'CmdOrCtrl+Z',
-          click: () => mainWindow.webContents.send('menu-undo')
+          click: () => mainWindow?.webContents.send('menu-undo')
         },
         {
           label: 'Повторити',
           accelerator: 'CmdOrCtrl+Shift+Z',
-          click: () => mainWindow.webContents.send('menu-redo')
+          click: () => mainWindow?.webContents.send('menu-redo')
         },
         { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'delete' },
+        { role: 'cut', label: 'Вирізати' },
+        { role: 'copy', label: 'Копіювати' },
+        { role: 'paste', label: 'Вставити' },
+        { role: 'delete', label: 'Видалити' },
         { type: 'separator' },
         {
           label: 'Вибрати все',
           accelerator: 'CmdOrCtrl+A',
-          click: () => mainWindow.webContents.send('menu-select-all')
+          click: () => mainWindow?.webContents.send('menu-select-all')
         }
       ]
     },
@@ -139,28 +155,28 @@ function createMenu() {
     {
       label: 'Вид',
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
-        { role: 'toggleDevTools' },
+        { role: 'reload', label: 'Перезавантажити' },
+        { role: 'forceReload', label: 'Примусово перезавантажити' },
+        { role: 'toggleDevTools', label: 'Інструменти розробника' },
         { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
+        { role: 'resetZoom', label: 'Скинути масштаб' },
+        { role: 'zoomIn', label: 'Збільшити' },
+        { role: 'zoomOut', label: 'Зменшити' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { role: 'togglefullscreen', label: 'Повноекранний режим' }
       ]
     },
     // Вікно
     {
       label: 'Вікно',
       submenu: [
-        { role: 'minimize' },
-        { role: 'close' },
+        { role: 'minimize', label: 'Згорнути' },
+        { role: 'close', label: 'Закрити' },
         ...(isMac ? [
           { type: 'separator' },
-          { role: 'front' },
+          { role: 'front', label: 'Всі на передній план' },
           { type: 'separator' },
-          { role: 'window' }
+          { role: 'window', label: 'Вікно' }
         ] : [])
       ]
     },
@@ -176,7 +192,7 @@ function createMenu() {
         },
         {
           label: 'Приклади',
-          click: () => mainWindow.webContents.send('menu-examples')
+          click: () => mainWindow?.webContents.send('menu-examples')
         },
         { type: 'separator' },
         {
@@ -200,15 +216,15 @@ function createMenu() {
     template.unshift({
       label: app.getName(),
       submenu: [
-        { role: 'about' },
+        { role: 'about', label: 'Про Canvas OS' },
         { type: 'separator' },
-        { role: 'services', submenu: [] },
+        { role: 'services', submenu: [], label: 'Послуги' },
         { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideOthers' },
-        { role: 'unhide' },
+        { role: 'hide', label: 'Приховати Canvas OS' },
+        { role: 'hideOthers', label: 'Приховати інші' },
+        { role: 'unhide', label: 'Показати все' },
         { type: 'separator' },
-        { role: 'quit' }
+        { role: 'quit', label: 'Вийти з Canvas OS' }
       ]
     });
   }
@@ -272,13 +288,7 @@ function setupIpcHandlers() {
     
     // Оновлення заголовка вікна
     const title = hasChanges ? 'Canvas OS *' : 'Canvas OS';
-    mainWindow.setTitle(title);
-  });
-
-  // Створення воркера
-  ipcMain.handle('worker:create', async (event, code) => {
-    // Воркери створюються в renderer процесі
-    return { success: true };
+    mainWindow?.setTitle(title);
   });
 
   // Системна інформація
@@ -289,6 +299,12 @@ function setupIpcHandlers() {
       version: process.versions,
       memory: process.memoryUsage()
     };
+  });
+
+    // Створення воркера
+  ipcMain.handle('worker:create', async (event, code) => {
+    // Воркери створюються в renderer процесі
+    return { success: true };
   });
 }
 
@@ -318,8 +334,20 @@ app.on('web-contents-created', (event, contents) => {
   contents.on('will-navigate', (event, navigationUrl) => {
     const parsedUrl = new URL(navigationUrl);
     
-    if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'file:') {
+    if (parsedUrl.protocol !== 'https:' && 
+        parsedUrl.protocol !== 'http:' && 
+        parsedUrl.protocol !== 'file:' &&
+        parsedUrl.protocol !== 'devtools:') {
       event.preventDefault();
     }
+  });
+  
+  // Блокування відкриття нових вікон
+  contents.setWindowOpenHandler(({ url }) => {
+    // Дозволити відкриття зовнішніх посилань в браузері
+    if (url.startsWith('https://') || url.startsWith('http://')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
   });
 });

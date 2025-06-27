@@ -2,7 +2,7 @@
 // React компонент для відображення вузла
 
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { NodeColors, NodeDimensions, PortConfig, NodeType } from '../core/constants.js';
+import { NodeColors, NodeDimensions, PortConfig, NodeType } from '@core/constants.js';
 
 export const NodeComponent = memo(({ 
   node, 

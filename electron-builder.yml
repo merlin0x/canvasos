@@ -1,0 +1,53 @@
+appId: com.canvasos.app
+productName: Canvas OS
+copyright: Copyright © 2024 Canvas OS Team
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - node_modules/**/*
+  - package.json
+
+asarUnpack:
+  - node_modules/sharp/**/*
+  - node_modules/@monaco-editor/**/*
+
+mac:
+  category: public.app-category.developer-tools
+  icon: build/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.inherit.plist
+  target:
+    - dmg
+    - zip
+
+win:
+  icon: build/icon.ico
+  target:
+    - nsis
+    - portable
+
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+  
+linux:
+  icon: build
+  category: Development
+  target:
+    - AppImage
+    - deb
+    - snap
+
+publish:
+  provider: github
+  owner: canvasos
+  repo: canvas-os

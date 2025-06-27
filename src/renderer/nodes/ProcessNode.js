@@ -1,8 +1,8 @@
 // src/renderer/nodes/ProcessNode.js
 // Вузол обробки даних з підтримкою користувацького коду
 
-import { CanvasNode } from '../core/Node.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { NodeType } from '@core/constants.js';
 
 export class ProcessNode extends CanvasNode {
   constructor(id, position, data = {}) {

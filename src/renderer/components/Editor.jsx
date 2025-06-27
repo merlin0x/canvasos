@@ -2,8 +2,8 @@
 // Редактор коду для вузлів
 
 import React, { useState, useEffect, useRef } from 'react';
-import { NodeType } from '../core/constants.js';
-import { ProcessNode } from '../nodes/ProcessNode.js';
+import { NodeType } from '@core/constants.js';
+import { ProcessNode } from '@nodes/ProcessNode.js';
 
 export function Editor({ nodeId, node, onClose, onUpdate }) {
   const [code, setCode] = useState('');

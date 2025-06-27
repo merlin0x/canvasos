@@ -1,7 +1,7 @@
 // src/renderer/utils/validators.js
 // Утиліти для валідації даних Canvas OS
 
-import { NodeType, Limits } from '../core/constants.js';
+import { NodeType, Limits } from '@core/constants.js';
 
 // === Валідатори типів ===
 

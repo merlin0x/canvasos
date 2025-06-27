@@ -2,9 +2,9 @@
 // Менеджер графа - керує вузлами та з'єднаннями
 
 import { BehaviorSubject, Subject } from 'rxjs';
-import { CanvasNode } from './Node.js';
-import { Edge } from './Edge.js';
-import { Limits, Messages } from './constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { Edge } from '@core/Edge.js';
+import { Limits, Messages } from '@core/constants.js';
 
 export class GraphManager {
   constructor() {

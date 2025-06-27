@@ -1,8 +1,8 @@
 // src/renderer/nodes/VisualizerNode.js
 // Вузол візуалізації даних
 
-import { CanvasNode } from '../core/Node.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { NodeType } from '@core/constants.js';
 
 export class VisualizerNode extends CanvasNode {
   constructor(id, position, data = {}) {

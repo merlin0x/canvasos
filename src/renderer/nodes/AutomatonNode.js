@@ -1,8 +1,8 @@
 // src/renderer/nodes/AutomatonNode.js
 // Вузол клітинного автомата
 
-import { CanvasNode } from '../core/Node.js';
-import { NodeType } from '../core/constants.js';
+import { CanvasNode } from '@core/Node.js';
+import { NodeType } from '@core/constants.js';
 import { interval } from 'rxjs';
 
 export class AutomatonNode extends CanvasNode {

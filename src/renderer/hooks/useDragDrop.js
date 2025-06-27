@@ -2,7 +2,7 @@
 // Хук для drag & drop функціональності
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { AnimationConfig } from '../core/constants.js';
+import { AnimationConfig } from '@core/constants.js';
 
 export function useDragDrop(graphManager) {
   const [draggedNode, setDraggedNode] = useState(null);
