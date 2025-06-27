@@ -1,0 +1,816 @@
+/* src/renderer/styles/components.css */
+/* Стилі для UI компонентів Canvas OS */
+
+/* === Layout === */
+.canvas-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #0a0a0a;
+}
+
+.canvas-main {
+  flex: 1;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+/* === Toolbar стилі === */
+.toolbar-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #3a3a3a;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.toolbar-button:hover:not(:disabled) {
+  background: #4a4a4a;
+  border-color: #666;
+  transform: translateY(-1px);
+}
+
+.toolbar-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toolbar-button.active {
+  background: #2196F3;
+  border-color: #2196F3;
+}
+
+.toolbar-button.danger:hover {
+  background: #f44336;
+  border-color: #f44336;
+}
+
+.tool-icon {
+  font-size: 16px;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+/* === Dropdown меню === */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 180px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #3a3a3a;
+}
+
+.node-icon {
+  font-size: 18px;
+}
+
+/* === Status Bar стилі === */
+.status-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #999;
+}
+
+.status-icon {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
+}
+
+.status-indicator.active {
+  background: #4CAF50;
+  animation: pulse 2s infinite;
+}
+
+.status-divider {
+  width: 1px;
+  height: 16px;
+  background: #444;
+}
+
+.status-spacer {
+  flex: 1;
+}
+
+.status-button {
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #999;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-button:hover {
+  background: #333;
+  border-color: #555;
+  color: #fff;
+}
+
+.status-button.active {
+  background: #333;
+  border-color: #2196F3;
+  color: #2196F3;
+}
+
+.status-version {
+  opacity: 0.5;
+  font-size: 11px;
+}
+
+/* === Панелі === */
+.panel {
+  position: absolute;
+  background: rgba(42, 42, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid #444;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  z-index: 900;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #444;
+}
+
+.panel-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.panel-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.panel-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.2s;
+}
+
+.panel-tab:hover {
+  background: #3a3a3a;
+  color: #fff;
+}
+
+.panel-tab.active {
+  background: #444;
+  color: #fff;
+}
+
+.tab-icon {
+  font-size: 14px;
+}
+
+.panel-content {
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+/* === Info Panel === */
+.info-panel {
+  top: 68px;
+  left: 20px;
+  width: 400px;
+  max-height: calc(100vh - 120px);
+}
+
+.help-content h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.help-content h4 {
+  margin-top: 20px;
+  margin-bottom: 12px;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.help-content ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #aaa;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.help-content strong {
+  color: #fff;
+}
+
+/* === Shortcuts таблиця === */
+.shortcuts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.shortcuts-table th {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #444;
+  color: #999;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.shortcuts-table td {
+  padding: 8px;
+  border-bottom: 1px solid #333;
+  color: #ccc;
+  font-size: 13px;
+}
+
+.shortcuts-table kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* === Examples === */
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.example-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.example-card:hover {
+  background: #3a3a3a;
+  border-color: #555;
+  transform: translateY(-2px);
+}
+
+.example-icon {
+  font-size: 32px;
+}
+
+.example-info h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #fff;
+}
+
+.example-info p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #999;
+}
+
+/* === Diagnostics === */
+.diagnostics-content section {
+  margin-bottom: 24px;
+}
+
+.diagnostics-content h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.diagnostics-table {
+  width: 100%;
+  font-size: 13px;
+}
+
+.diagnostics-table td {
+  padding: 4px 8px;
+  color: #aaa;
+}
+
+.diagnostics-table td:first-child {
+  color: #999;
+  text-align: right;
+  padding-right: 12px;
+}
+
+.diagnostics-table code {
+  font-family: monospace;
+  font-size: 12px;
+  color: #4CAF50;
+}
+
+.diagnostics-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagnostic-node {
+  padding: 8px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.diagnostic-node strong {
+  color: #fff;
+}
+
+.error-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #f44336;
+  color: #fff;
+  border-radius: 3px;
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.node-metrics {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #999;
+}
+
+/* === Editor Panel === */
+.editor-panel {
+  top: 68px;
+  right: 20px;
+  width: 480px;
+  max-height: calc(100vh - 120px);
+}
+
+.editor-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.node-type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.node-id {
+  font-family: monospace;
+  font-size: 12px;
+  color: #999;
+}
+
+.editor-tabs {
+  display: flex;
+  border-bottom: 1px solid #444;
+}
+
+.editor-tab {
+  flex: 1;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #999;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editor-tab:hover {
+  background: #333;
+  color: #fff;
+}
+
+.editor-tab.active {
+  color: #2196F3;
+  border-bottom-color: #2196F3;
+}
+
+.editor-content {
+  padding: 0;
+  overflow: visible;
+}
+
+/* === Code Editor === */
+.code-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.code-toolbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #444;
+}
+
+.apply-button {
+  padding: 6px 16px;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.apply-button:hover {
+  background: #45a049;
+}
+
+.snippets-dropdown {
+  position: relative;
+}
+
+.snippets-button {
+  padding: 6px 12px;
+  background: #3a3a3a;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.snippets-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  display: none;
+  min-width: 160px;
+}
+
+.snippets-dropdown:hover .snippets-menu {
+  display: block;
+}
+
+.snippet-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.snippet-item:hover {
+  background: #3a3a3a;
+}
+
+.code-input-wrapper {
+  display: flex;
+  flex: 1;
+  min-height: 200px;
+  background: #1a1a1a;
+}
+
+.code-line-numbers {
+  padding: 12px 8px;
+  background: #0a0a0a;
+  border-right: 1px solid #333;
+  font-family: monospace;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+  user-select: none;
+}
+
+.line-number {
+  line-height: 18px;
+}
+
+.code-textarea {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 18px;
+  resize: none;
+  outline: none;
+}
+
+.code-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(244, 67, 54, 0.1);
+  border-top: 1px solid #f44336;
+  color: #f44336;
+  font-size: 12px;
+}
+
+.error-icon {
+  font-size: 16px;
+}
+
+.code-help {
+  padding: 12px;
+  background: #2a2a2a;
+  border-top: 1px solid #444;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.code-help p {
+  margin: 0 0 8px;
+}
+
+.code-help ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.code-help code {
+  background: #1a1a1a;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #4CAF50;
+}
+
+/* === Config Editor === */
+.config-editor {
+  padding: 16px;
+}
+
+.config-field {
+  margin-bottom: 16px;
+}
+
+.config-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.config-field input[type="text"],
+.config-field input[type="number"],
+.config-field select {
+  width: 100%;
+  padding: 8px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px;
+}
+
+.config-field input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.config-field input[type="color"] {
+  width: 60px;
+  height: 32px;
+  padding: 2px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* === Help Content === */
+.code-example {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.code-example pre {
+  margin: 0 0 8px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #4CAF50;
+}
+
+.code-example p {
+  margin: 0;
+  font-size: 12px;
+  color: #999;
+}
+
+/* === Minimap === */
+.minimap {
+  position: absolute;
+  bottom: 40px;
+  right: 20px;
+  background: rgba(42, 42, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 900;
+}
+
+.minimap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #444;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.minimap-zoom {
+  color: #2196F3;
+  font-weight: 600;
+}
+
+.minimap-canvas {
+  display: block;
+  background: #0a0a0a;
+}
+
+.minimap-stats {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid #444;
+  font-size: 11px;
+  color: #999;
+}
+
+/* === Drag Preview === */
+.drag-preview {
+  padding: 6px 12px;
+  background: #2196F3;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* === Loading === */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.loading-spinner {
+  text-align: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #333;
+  border-top-color: #2196F3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* === Responsive === */
+@media (max-width: 1200px) {
+  .info-panel,
+  .editor-panel {
+    width: 360px;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-panel,
+  .editor-panel {
+    position: fixed;
+    top: 48px;
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
+    border-radius: 0;
+  }
+  
+  .minimap {
+    display: none;
+  }
+}
